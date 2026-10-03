@@ -45,9 +45,11 @@ button, textarea, input { font: inherit; }
 .guide-body { padding: 0 19px 17px; border-top: 1px solid #d6defd; }
 .guide-body ul { margin: 13px 0 0; padding-left: 20px; display: grid; gap: 6px; }
 .guide-body li { color: #29344d; font-size: 14px; line-height: 1.5; }
-.guide-example, .guide-next { margin: 13px 0 0; display: flex; gap: 9px; align-items: baseline; font-size: 13px; line-height: 1.5; }
-.guide-example strong, .guide-next strong { flex: none; color: var(--blue); }
-.guide-example span { color: #29344d; font-style: italic; }
+.guide-example { margin: 15px 0 0; padding: 14px 16px; border: 1px solid #c9d3fb; border-radius: 10px; background: #fff; }
+.guide-example strong { display: block; margin-bottom: 8px; color: var(--blue); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.guide-example p { margin: 0; color: #29344d; font-size: 14px; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
+.guide-next { margin: 13px 0 0; display: flex; gap: 9px; align-items: baseline; font-size: 13px; line-height: 1.5; }
+.guide-next strong { flex: none; color: var(--blue); }
 .guide-next { padding-top: 11px; border-top: 1px solid #d6defd; color: #29344d; }
 .brief-grid { display: grid; grid-template-columns: 1fr 1.08fr; gap: 14px; }
 .panel { min-width: 0; min-height: 334px; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--white); box-shadow: 0 9px 30px rgba(17,27,49,.04); }
@@ -247,7 +249,7 @@ button, textarea, input { font: inherit; }
   .lesson-main { padding: 28px 18px 36px; }
   .step-guide summary { flex-wrap: wrap; }
   .guide-toggle { width: 100%; margin-left: 0; }
-  .guide-example, .guide-next { flex-direction: column; gap: 2px; }
+  .guide-next { flex-direction: column; gap: 2px; }
   .progress-step { grid-template-columns: 1fr; }
   .progress-step i { display: none; }
   .brief-grid, .review-context, .review-fields, .short-answer { grid-template-columns: 1fr; }

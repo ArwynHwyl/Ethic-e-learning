@@ -50,81 +50,78 @@ const labels: { value: ClaimLabel; title: string }[] = [
 
 const stepGuides = [
   {
-    title: "Start with the access rule",
+    title: "What should I write here?",
     points: [
-      "Read what the ticket asks for, then compare it with what the current code allows.",
-      "Authentication tells us who signed in. Authorization decides which invoice that person may open.",
-      "Before seeing the AI suggestion, consider the customer, support, and admin roles separately.",
+      "The ticket wants support agents to open customer invoices. A regular customer should still see only their own invoices.",
+      "Think about who can call this page and how the code checks each person's permission.",
     ],
-    answerFrame: "I would check who can call this endpoint, who should be allowed to open another person's invoice, and which tests cover that rule.",
-    next: "Write at least one sentence in the green box to continue.",
+    sampleAnswer: "I would check which roles can call the endpoint, confirm that only support agents may open another customer's invoice, and test that a regular customer cannot open someone else's invoice.",
+    next: "Type a sentence in the green box, then click Continue to AI suggestion.",
   },
   {
-    title: "Read the change before the explanation",
+    title: "What am I looking at?",
     points: [
-      "Compare the current code with the suggested patch. Identify which condition disappears.",
-      "For each sentence in the AI explanation, ask: what evidence would prove this claim?",
-      "Keep your expectation from Step 1 in mind. A confident explanation is still a claim to check.",
+      "The AI removed the line that checks whether the invoice belongs to the current user.",
+      "Anyone who is signed in can reach this endpoint. Ask whether the patch checks for the support role anywhere.",
+      "The AI's explanation is a claim. You will check its separate statements on the next page.",
     ],
-    next: "There is no answer to enter here. Continue when you can describe what the patch changes.",
+    next: "Nothing to type here. Click Evaluate the explanation.",
   },
   {
-    title: "Sort claims by what you can verify",
+    title: "Which option should I choose?",
     points: [
-      "Supported: the information shown or a check you performed directly backs the claim.",
-      "Assumption: the claim treats something as true without establishing it.",
-      "Unverifiable: there is not enough information yet to judge the claim.",
+      "Supported means a check backs the statement. Assumption means the AI has taken something for granted. Unverifiable means the current information is not enough to judge it.",
+      "Passing tests does not prove that the tests checked access to another customer's invoice.",
     ],
-    answerFrame: "Claim C__ needs more scrutiny because __. I would check __ to find out whether it holds.",
-    next: "Label all five claims and write a short reason (at least 20 characters).",
+    sampleAnswer: "C1: Supported · C2: Assumption · C3: Assumption · C4: Unverifiable · C5: Supported\n\nReason to type: The claim that authentication protects this endpoint needs scrutiny because signing in does not prove that a customer is allowed to open another customer's invoice. I would check the roles and access rule.",
+    next: "Select one label in every row, type a reason, then click Choose evidence.",
   },
   {
-    title: "Choose checks that answer the real question",
+    title: "What should I check?",
     points: [
-      "Ask whether each check can tell you who may open an invoice after this change.",
-      "A passing test is useful only for the cases that test actually covers.",
-      "Compare the ticket, code change, reachable roles, and available helpers where relevant.",
+      "Choose checks that tell you what the ticket requires and who may open an invoice after the change.",
+      "Existing unit tests are worth viewing, but look at which case they do not test.",
+      "Code formatting and response time cannot tell you whether access is allowed correctly.",
     ],
-    next: "Select one or more checks, then press Run selected checks to reveal their results.",
+    sampleAnswer: "Tick these five: Run existing unit tests; Re-read the ticket text; View the full diff; Check who can reach the endpoint; Search for an existing role helper. Leave code style and response time unticked.",
+    next: "Click Run selected checks, read the results on the right, then click Make developer decision.",
   },
   {
-    title: "Write a reviewable developer note",
+    title: "What should the developer write?",
     points: [
-      "State what the patch changes and who could be affected.",
-      "Name the evidence you checked and what it did or did not show.",
-      "Tell the reviewer what still needs verification. Choose the risk level based on possible impact.",
+      "Say what the patch removes, who could access other people's data, and what you checked.",
+      "This affects invoice access, so choose the risk level based on possible data exposure.",
     ],
-    answerFrame: "The change affects __. I checked __, which showed __. The reviewer should verify __.",
-    next: "Write a specific note (at least 25 characters) and choose Low, Medium, or High.",
+    sampleAnswer: "Your justification: The patch removes the ownership check without adding a support-role check. The ticket, diff, and endpoint reachability show that any authenticated customer could access another customer's invoice. The reviewer should verify that only the owner or a support agent can open it.\n\nSelf-declared risk level: High",
+    next: "Type the justification, select High, then click Submit for review.",
   },
   {
-    title: "Decide as an independent reviewer",
+    title: "What should the reviewer decide?",
     points: [
-      "Approve only if the evidence supports the required access rule.",
-      "Reject when you can describe a required correction. Escalate when the risk needs specialist review or you lack certainty.",
-      "Connect your reason to the ticket and evidence. The named reviewer owns this decision.",
+      "The proposed patch lets any signed-in customer open another customer's invoice, so it should not be accepted as it is.",
+      "Reject if you can describe the fix. Escalate is also reasonable if you need a security specialist to decide.",
     ],
-    answerFrame: "I chose __ because the evidence shows __. Before this change can proceed, __.",
-    next: "Choose one action, write a reason (at least 20 characters), and enter the reviewer's name.",
+    sampleAnswer: "Your decision: Reject\n\nReason: Reject because removing the ownership check allows any authenticated customer to access another customer's invoice. Keep the owner check and add an exception for the support role only.\n\nNamed approver: Enter your name as the simulated reviewer.",
+    next: "Choose Reject, type the reason and a reviewer name, then click Record decision.",
   },
   {
-    title: "Check whether the decision can be reconstructed",
+    title: "What do I check in this record?",
     points: [
-      "Read the evidence_checked, developer_note, reviewer_action, and reviewer_note fields.",
-      "Ask whether another person could understand what happened and why from this record.",
-      "Use Back if a field is unclear. The record also shows what information is excluded for privacy.",
+      "Check that evidence_checked lists the checks you ran, developer_note contains your explanation, and reviewer_action says reject or escalate.",
+      "Check that reviewer_note explains why and approved_by shows the simulated reviewer's name.",
+      "If something is missing, go Back and complete it. This page has no new input fields.",
     ],
-    next: "There is no new input here. Review the record, then open the rubric feedback.",
+    next: "After checking the record, click See rubric feedback.",
   },
   {
-    title: "Use the feedback to improve your reasoning",
+    title: "How do I read my result?",
     points: [
-      "Read R1–R5 separately to see which part of the review needs work.",
-      "Compare the test result with the access rule the tests were meant to cover.",
-      "Inspect the expected safe fix. If a score misses a valid reason you gave, use Challenge this score and cite the evidence.",
+      "R1 checks whether you identified the access problem; R2 checks your evidence; R3 checks the AI claims; R4 checks your decision; R5 checks the review record.",
+      "The 12 passing tests missed the case where one customer requests another customer's invoice.",
+      "The safe fix below the score allows the owner or a support agent, but blocks another customer.",
     ],
-    answerFrame: "Please reconsider R__ because my response identified __ and the evidence was __.",
-    next: "You can review the scenario again after reading the feedback.",
+    sampleAnswer: "Optional challenge: Please reconsider R1 because I explained that the patch lets another customer view an invoice they do not own, and I supported this with the ticket, diff, and endpoint reachability.",
+    next: "There is no required answer here. Read the feedback or click Review the scenario again.",
   },
 ] as const;
 
@@ -418,7 +415,7 @@ function StepGuide({ step }: { step: number }) {
     <summary><span className="guide-tag">Guide · {String(step).padStart(2, "0")}</span><strong>{guide.title}</strong><span className="guide-toggle">Show / hide</span></summary>
     <div className="guide-body">
       <ul>{guide.points.map((point) => <li key={point}>{point}</li>)}</ul>
-      {"answerFrame" in guide && <p className="guide-example"><strong>Example structure</strong><span>{guide.answerFrame}</span></p>}
+      {"sampleAnswer" in guide && <div className="guide-example"><strong>Example you can use</strong><p>{guide.sampleAnswer}</p></div>}
       <p className="guide-next"><strong>To continue</strong>{guide.next}</p>
     </div>
   </details>;
