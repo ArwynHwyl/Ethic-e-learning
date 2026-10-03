@@ -35,6 +35,20 @@ button, textarea, input { font: inherit; }
 .step-heading { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 26px; }
 .step-heading h2 { margin: 0; font-size: clamp(36px, 4.2vw, 66px); line-height: .9; letter-spacing: -.065em; }
 .step-heading > p { max-width: 340px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.step-guide { margin: 0 0 18px; border: 1px solid #b9c5f4; border-radius: 15px; background: #eef1ff; box-shadow: 0 7px 22px rgba(51,92,255,.06); }
+.step-guide summary { padding: 15px 19px; display: flex; align-items: center; gap: 14px; cursor: pointer; list-style: none; }
+.step-guide summary::-webkit-details-marker { display: none; }
+.step-guide summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 12px; }
+.guide-tag { flex: none; color: var(--blue); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.step-guide summary strong { font-size: 16px; line-height: 1.3; }
+.guide-toggle { margin-left: auto; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.guide-body { padding: 0 19px 17px; border-top: 1px solid #d6defd; }
+.guide-body ul { margin: 13px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.guide-body li { color: #29344d; font-size: 14px; line-height: 1.5; }
+.guide-example, .guide-next { margin: 13px 0 0; display: flex; gap: 9px; align-items: baseline; font-size: 13px; line-height: 1.5; }
+.guide-example strong, .guide-next strong { flex: none; color: var(--blue); }
+.guide-example span { color: #29344d; font-style: italic; }
+.guide-next { padding-top: 11px; border-top: 1px solid #d6defd; color: #29344d; }
 .brief-grid { display: grid; grid-template-columns: 1fr 1.08fr; gap: 14px; }
 .panel { min-width: 0; min-height: 334px; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--white); box-shadow: 0 9px 30px rgba(17,27,49,.04); }
 .panel-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 18px; border-bottom: 1px solid #e9e5dc; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .09em; }
@@ -231,6 +245,9 @@ button, textarea, input { font: inherit; }
   .lesson-rail { display: block; }
   .role-card { margin-top: 24px; }
   .lesson-main { padding: 28px 18px 36px; }
+  .step-guide summary { flex-wrap: wrap; }
+  .guide-toggle { width: 100%; margin-left: 0; }
+  .guide-example, .guide-next { flex-direction: column; gap: 2px; }
   .progress-step { grid-template-columns: 1fr; }
   .progress-step i { display: none; }
   .brief-grid, .review-context, .review-fields, .short-answer { grid-template-columns: 1fr; }

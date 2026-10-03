@@ -48,6 +48,86 @@ const labels: { value: ClaimLabel; title: string }[] = [
   { value: "unverifiable", title: "Unverifiable" },
 ];
 
+const stepGuides = [
+  {
+    title: "Start with the access rule",
+    points: [
+      "Read what the ticket asks for, then compare it with what the current code allows.",
+      "Authentication tells us who signed in. Authorization decides which invoice that person may open.",
+      "Before seeing the AI suggestion, consider the customer, support, and admin roles separately.",
+    ],
+    answerFrame: "I would check who can call this endpoint, who should be allowed to open another person's invoice, and which tests cover that rule.",
+    next: "Write at least one sentence in the green box to continue.",
+  },
+  {
+    title: "Read the change before the explanation",
+    points: [
+      "Compare the current code with the suggested patch. Identify which condition disappears.",
+      "For each sentence in the AI explanation, ask: what evidence would prove this claim?",
+      "Keep your expectation from Step 1 in mind. A confident explanation is still a claim to check.",
+    ],
+    next: "There is no answer to enter here. Continue when you can describe what the patch changes.",
+  },
+  {
+    title: "Sort claims by what you can verify",
+    points: [
+      "Supported: the information shown or a check you performed directly backs the claim.",
+      "Assumption: the claim treats something as true without establishing it.",
+      "Unverifiable: there is not enough information yet to judge the claim.",
+    ],
+    answerFrame: "Claim C__ needs more scrutiny because __. I would check __ to find out whether it holds.",
+    next: "Label all five claims and write a short reason (at least 20 characters).",
+  },
+  {
+    title: "Choose checks that answer the real question",
+    points: [
+      "Ask whether each check can tell you who may open an invoice after this change.",
+      "A passing test is useful only for the cases that test actually covers.",
+      "Compare the ticket, code change, reachable roles, and available helpers where relevant.",
+    ],
+    next: "Select one or more checks, then press Run selected checks to reveal their results.",
+  },
+  {
+    title: "Write a reviewable developer note",
+    points: [
+      "State what the patch changes and who could be affected.",
+      "Name the evidence you checked and what it did or did not show.",
+      "Tell the reviewer what still needs verification. Choose the risk level based on possible impact.",
+    ],
+    answerFrame: "The change affects __. I checked __, which showed __. The reviewer should verify __.",
+    next: "Write a specific note (at least 25 characters) and choose Low, Medium, or High.",
+  },
+  {
+    title: "Decide as an independent reviewer",
+    points: [
+      "Approve only if the evidence supports the required access rule.",
+      "Reject when you can describe a required correction. Escalate when the risk needs specialist review or you lack certainty.",
+      "Connect your reason to the ticket and evidence. The named reviewer owns this decision.",
+    ],
+    answerFrame: "I chose __ because the evidence shows __. Before this change can proceed, __.",
+    next: "Choose one action, write a reason (at least 20 characters), and enter the reviewer's name.",
+  },
+  {
+    title: "Check whether the decision can be reconstructed",
+    points: [
+      "Read the evidence_checked, developer_note, reviewer_action, and reviewer_note fields.",
+      "Ask whether another person could understand what happened and why from this record.",
+      "Use Back if a field is unclear. The record also shows what information is excluded for privacy.",
+    ],
+    next: "There is no new input here. Review the record, then open the rubric feedback.",
+  },
+  {
+    title: "Use the feedback to improve your reasoning",
+    points: [
+      "Read R1–R5 separately to see which part of the review needs work.",
+      "Compare the test result with the access rule the tests were meant to cover.",
+      "Inspect the expected safe fix. If a score misses a valid reason you gave, use Challenge this score and cite the evidence.",
+    ],
+    answerFrame: "Please reconsider R__ because my response identified __ and the evidence was __.",
+    next: "You can review the scenario again after reading the feedback.",
+  },
+] as const;
+
 export default function Home() {
   const [step, setStep] = useState(1);
   const [maxStep, setMaxStep] = useState(1);
@@ -146,6 +226,7 @@ export default function Home() {
           {step === 1 && (
             <>
               <StepHeading eyebrow="Step 01 · Form an expectation" title="Scenario briefing" description="Read the requirement and current code before any AI output appears." />
+              <StepGuide step={step} />
               <div className="brief-grid">
                 <article className="panel requirement-panel">
                   <PanelLabel left="Requirement" right="Ticket SUP-482" />
@@ -171,6 +252,7 @@ export default function Home() {
           {step === 2 && (
             <>
               <StepHeading eyebrow="Step 02 · Inspect without anchoring" title="AI suggestion" description="The suggestion and your review area carry equal visual weight. Nothing has been approved yet." />
+              <StepGuide step={step} />
               <div className="balanced-grid">
                 <CodePanel label="AI-suggested patch" file="2 lines removed · 0 added" code={suggestedCode} footer="1 file changed" diff />
                 <article className="panel explanation-panel">
@@ -188,6 +270,7 @@ export default function Home() {
           {step === 3 && (
             <>
               <StepHeading eyebrow="Step 03 · Explanation quality" title="Label every claim" description="Decide whether each statement is supported by evidence, an assumption, or unverifiable." />
+              <StepGuide step={step} />
               <section className="claim-table panel">
                 <div className="claim-header"><span>Claim from the AI explanation</span>{labels.map((label) => <span key={label.value}>{label.title}</span>)}</div>
                 {claims.map((claim, index) => (
@@ -213,6 +296,7 @@ export default function Home() {
           {step === 4 && (
             <>
               <StepHeading eyebrow="Step 04 · Verification" title="Choose your evidence" description="Results appear only for the checks you select. Green results can still answer the wrong question." />
+              <StepGuide step={step} />
               <div className="evidence-layout">
                 <section className="evidence-list panel">
                   <PanelLabel left="Checks to run" right={`${selectedEvidence.length} selected`} />
@@ -241,6 +325,7 @@ export default function Home() {
           {step === 5 && (
             <>
               <StepHeading eyebrow="Step 05 · Human accountability" title="Developer decision" description="You proposed the change. You can explain and submit it, but you cannot approve it yourself." />
+              <StepGuide step={step} />
               <div className="role-banner"><span>Role · Developer</span><strong>Self-approval is disabled by design.</strong><p>The only available action is to submit this change for an independent review.</p></div>
               <section className="decision-form panel">
                 <label htmlFor="developer-note">Your justification</label>
@@ -255,6 +340,7 @@ export default function Home() {
           {step === 6 && (
             <>
               <StepHeading eyebrow="Step 06 · Independent review" title="Reviewer decision" description="Same change, different role. Approve, reject, and escalate have identical visual weight." />
+              <StepGuide step={step} />
               <div className="review-context">
                 <article className="panel"><PanelLabel left="Proposed change" right={`${selectedEvidence.length} checks`} /><pre><code>- if invoice.user_id != current_user.id:{`\n`}    - raise 404</code></pre><p>Developer risk: <b>{riskLevel || "Not declared"}</b></p></article>
                 <article className="panel"><PanelLabel left="Developer justification" right="Submitted" /><blockquote>“{developerJustification}”</blockquote></article>
@@ -274,6 +360,7 @@ export default function Home() {
           {step === 7 && (
             <>
               <StepHeading eyebrow="Step 07 · Auditability" title="Decision log entry" description="This is exactly what will be stored. The audit trail is part of the lesson—not an afterthought." />
+              <StepGuide step={step} />
               <section className="log-card panel">
                 <div className="log-head"><div><span>Immutable learning record</span><strong>TRACE / SUP-482 / 01</strong></div><div className="status-stamp">Recorded</div></div>
                 <dl>
@@ -297,6 +384,7 @@ export default function Home() {
           {step === 8 && (
             <>
               <StepHeading eyebrow="Step 08 · Transparent feedback" title="Your reasoning, scored" description="Scores are separated by dimension. More than one human decision can be defensible." />
+              <StepGuide step={step} />
               <section className="score-hero"><div><p>Scenario score</p><strong>{total}<span>/100</span></strong></div><p>{total >= 80 ? "Strong accountable review" : total >= 60 ? "Promising—strengthen the evidence trail" : "Revisit the gap between tests and authorization"}</p></section>
               <div className="rubric-layout">
                 <section className="rubric-panel panel">
@@ -322,6 +410,18 @@ export default function Home() {
 
 function StepHeading({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
   return <div className="step-heading"><div><p className="eyebrow">{eyebrow}</p><h2>{title}</h2></div><p>{description}</p></div>;
+}
+
+function StepGuide({ step }: { step: number }) {
+  const guide = stepGuides[step - 1];
+  return <details className="step-guide" open key={step}>
+    <summary><span className="guide-tag">Guide · {String(step).padStart(2, "0")}</span><strong>{guide.title}</strong><span className="guide-toggle">Show / hide</span></summary>
+    <div className="guide-body">
+      <ul>{guide.points.map((point) => <li key={point}>{point}</li>)}</ul>
+      {"answerFrame" in guide && <p className="guide-example"><strong>Example structure</strong><span>{guide.answerFrame}</span></p>}
+      <p className="guide-next"><strong>To continue</strong>{guide.next}</p>
+    </div>
+  </details>;
 }
 
 function PanelLabel({ left, right }: { left: string; right: string }) {
