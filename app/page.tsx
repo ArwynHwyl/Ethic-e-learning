@@ -52,6 +52,7 @@ const stepGuides = [
   {
     title: "What should I write here?",
     points: [
+      "AI is a tool. It can suggest code, but it cannot be responsible for releasing an unsafe change. The developer and human reviewer remain responsible for what they submit and approve.",
       "The ticket wants support agents to open customer invoices. A regular customer should still see only their own invoices.",
       "Think about who can call this page and how the code checks each person's permission.",
     ],
@@ -89,6 +90,7 @@ const stepGuides = [
   {
     title: "What should the developer write?",
     points: [
+      "Do not use 'the AI wrote it' as an excuse. You are responsible for checking the suggestion before sending it to a reviewer.",
       "Say what the patch removes, who could access other people's data, and what you checked.",
       "This affects invoice access, so choose the risk level based on possible data exposure.",
     ],
@@ -98,6 +100,7 @@ const stepGuides = [
   {
     title: "What should the reviewer decide?",
     points: [
+      "The AI cannot approve its own suggestion. A human reviewer must decide whether the evidence supports a safe release and own that decision.",
       "The proposed patch lets any signed-in customer open another customer's invoice, so it should not be accepted as it is.",
       "Reject if you can describe the fix. Escalate is also reasonable if you need a security specialist to decide.",
     ],
@@ -116,6 +119,7 @@ const stepGuides = [
   {
     title: "How do I read my result?",
     points: [
+      "The final decision belongs to people, even when AI produced the proposed code. 'AI made the mistake' does not remove the developer's or reviewer's responsibility.",
       "R1 checks whether you identified the access problem; R2 checks your evidence; R3 checks the AI claims; R4 checks your decision; R5 checks the review record.",
       "The 12 passing tests missed the case where one customer requests another customer's invoice.",
       "The safe fix below the score allows the owner or a support agent, but blocks another customer.",
@@ -192,7 +196,7 @@ export default function Home() {
           <div>
             <p className="eyebrow">Learning scenario 01</p>
             <h1>Who owns an<br />AI decision?</h1>
-            <p className="rail-copy">Practice separating fluent explanations from evidence you can defend.</p>
+            <p className="rail-copy">AI can suggest a change. People must verify it, decide, and own the outcome.</p>
           </div>
           <div className="role-card" key={role}>
             <p>Your role</p>
@@ -223,6 +227,7 @@ export default function Home() {
           {step === 1 && (
             <>
               <StepHeading eyebrow="Step 01 · Form an expectation" title="Scenario briefing" description="Read the requirement and current code before any AI output appears." />
+              <section className="lesson-goal" aria-label="Learning objective"><strong>Learning objective</strong><p>Explain why AI-generated code does not transfer responsibility away from the developer and reviewer. AI is a tool; people must check its work and answer for the final decision.</p></section>
               <StepGuide step={step} />
               <div className="brief-grid">
                 <article className="panel requirement-panel">
@@ -321,7 +326,7 @@ export default function Home() {
 
           {step === 5 && (
             <>
-              <StepHeading eyebrow="Step 05 · Human accountability" title="Developer decision" description="You proposed the change. You can explain and submit it, but you cannot approve it yourself." />
+              <StepHeading eyebrow="Step 05 · Human accountability" title="Developer decision" description="You used the AI suggestion. You must check and explain it; blaming AI cannot replace your review." />
               <StepGuide step={step} />
               <div className="role-banner"><span>Role · Developer</span><strong>Self-approval is disabled by design.</strong><p>The only available action is to submit this change for an independent review.</p></div>
               <section className="decision-form panel">
@@ -336,7 +341,7 @@ export default function Home() {
 
           {step === 6 && (
             <>
-              <StepHeading eyebrow="Step 06 · Independent review" title="Reviewer decision" description="Same change, different role. Approve, reject, and escalate have identical visual weight." />
+              <StepHeading eyebrow="Step 06 · Independent review" title="Reviewer decision" description="A human reviewer owns the final approval decision. AI cannot make it on their behalf." />
               <StepGuide step={step} />
               <div className="review-context">
                 <article className="panel"><PanelLabel left="Proposed change" right={`${selectedEvidence.length} checks`} /><pre><code>- if invoice.user_id != current_user.id:{`\n`}    - raise 404</code></pre><p>Developer risk: <b>{riskLevel || "Not declared"}</b></p></article>
@@ -356,7 +361,7 @@ export default function Home() {
 
           {step === 7 && (
             <>
-              <StepHeading eyebrow="Step 07 · Auditability" title="Decision log entry" description="This is exactly what will be stored. The audit trail is part of the lesson—not an afterthought." />
+              <StepHeading eyebrow="Step 07 · Auditability" title="Decision log entry" description="See which people checked the evidence, made the decision, and can explain it afterward." />
               <StepGuide step={step} />
               <section className="log-card panel">
                 <div className="log-head"><div><span>Immutable learning record</span><strong>TRACE / SUP-482 / 01</strong></div><div className="status-stamp">Recorded</div></div>
@@ -389,9 +394,9 @@ export default function Home() {
                   <RubricRow label="R2 · Evidence selection" score={scores[1]} max={25} />
                   <RubricRow label="R3 · Explanation versus proof" score={scores[2]} max={20} />
                   <RubricRow label="R4 · Appropriate action" score={scores[3]} max={15} />
-                  <RubricRow label="R5 · Accountability record" score={scores[4]} max={10} />
+                  <RubricRow label="R5 · Human accountability record" score={scores[4]} max={10} />
                 </section>
-                <aside className="why-panel panel"><p className="eyebrow">Why this score</p><h3>Reject and escalate can both earn full credit.</h3><p>Reject is appropriate when you can state the safe fix. Escalate is appropriate when you identify the risk but lack authority or certainty.</p><span className="outcome-pill">Your action · {reviewDecision || "—"}</span></aside>
+                <aside className="why-panel panel"><p className="eyebrow">Why this score</p><h3>Reject and escalate can both earn full credit.</h3><p>Reject is appropriate when you can state the safe fix. Escalate is appropriate when you identify the risk but lack authority or certainty.</p><p>AI is a tool, not an accountable teammate. The developer and reviewer still own their decisions.</p><span className="outcome-pill">Your action · {reviewDecision || "—"}</span></aside>
               </div>
               <section className="trap-card"><div><span>12</span><small>tests passed</small></div><div><p className="eyebrow">The test trap</p><h3>The result was correct—and it answered the wrong question.</h3><p>No existing test requests an invoice belonging to another customer, so the suite cannot detect the authorization gap.</p></div></section>
               <section className="safe-fix panel"><PanelLabel left="Expected safe fix" right="Revealed after feedback" /><pre><code>{safeFix}</code></pre></section>
